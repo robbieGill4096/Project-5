@@ -1,8 +1,6 @@
 import java.awt.Point;
 import java.lang.reflect.Type;
 
-import portOFmarrow.guiclass.BoardChoice;
-
 //stores and works with game data 
 //a 2D Player array from the game board
 //1D Point array for moves.
@@ -13,9 +11,9 @@ public class TicTacToeGame implements TicTacToe {
 			{ TicTacToe.BoardChoice.OPEN, TicTacToe.BoardChoice.OPEN, TicTacToe.BoardChoice.OPEN },
 			{ TicTacToe.BoardChoice.OPEN, TicTacToe.BoardChoice.OPEN, TicTacToe.BoardChoice.OPEN },
 			{ TicTacToe.BoardChoice.OPEN, TicTacToe.BoardChoice.OPEN, TicTacToe.BoardChoice.OPEN } };
-	public GameState state;
-	public int numOfMoves = 0;
-	Point[] moveHistory = new Point[DIM * DIM];
+	private GameState state;
+	private int numOfMoves = 0;
+	private Point[] moveHistory = new Point[DIM * DIM];
 
 	// test
 	// numOfMoves =0;
@@ -42,9 +40,10 @@ public class TicTacToeGame implements TicTacToe {
 		// if position is claimed != BoardChoice.OPEN or (player made previous choice)
 		// return false <-----you could use getMOves movehistory[lastindex] %/2
 		if ((board[row][col] != BoardChoice.OPEN)) {
+			
 			return false;
 		}
-		if ((board[row][col] == BoardChoice.OPEN) && (gameOver() != true)) {
+		if ((board[row][col] == BoardChoice.OPEN) && (gameOver() == false)) {
 			if (player == BoardChoice.X) {
 				board[row][col] = BoardChoice.X;
 
@@ -52,8 +51,9 @@ public class TicTacToeGame implements TicTacToe {
 				moveHistory[numOfMoves] = plot;
 				numOfMoves += 1;
 				return true;
-			} else {
+			} if (player == BoardChoice.O) {
 				board[row][col] = BoardChoice.O;
+
 				Point plot = new Point(row, col);
 				moveHistory[numOfMoves] = plot;
 
@@ -69,92 +69,96 @@ public class TicTacToeGame implements TicTacToe {
 	@Override
 	public boolean gameOver() {
 
-		// horizontal
-		if ((board[0][0] == board[0][1]) && (board[0][1] == board[0][2]) && board[0][0] != BoardChoice.OPEN) {
-			// return game is over
-			return true;
-		}
-		if ((board[1][0] == board[1][1]) && (board[1][1] == board[1][2]) && board[1][0] != BoardChoice.OPEN) {
-			// return game is over
+		for (int x = 0; x < DIM; x++) {
+			if ((board[x][0] == board[x][1]) && (board[x][1] == board[x][2]) && board[x][0] != BoardChoice.OPEN) {
+				if (board[x][0] == BoardChoice.X) {
 
-			return true;
-		}
-		if ((board[2][0] == board[2][1]) && (board[2][1] == board[2][2]) && board[2][0] != BoardChoice.OPEN) {
-			// return game is over
+					state = GameState.X_WON;
+					return true;
+				} else {
 
-			return true;
-		}
-		// vertical
-		if ((board[0][0] == board[1][0]) && (board[1][0] == board[2][0]) && board[0][0] != BoardChoice.OPEN) {
-			// return game is over
+					state = GameState.O_WON;
+					return true;
+				}
+			}
+			if ((board[0][x] == board[1][x]) && (board[1][x] == board[2][x]) && board[0][x] != BoardChoice.OPEN) {
+				if (board[0][x] == BoardChoice.X) {
 
-			return true;
-		}
-		if ((board[0][1] == board[1][1]) && (board[1][1] == board[2][1]) && board[0][1] != BoardChoice.OPEN) {
-			// return game is over
+					state = GameState.X_WON;
 
-			return true;
-		}
-		if ((board[0][2] == board[1][2]) && (board[1][2] == board[2][2]) && board[0][2] != BoardChoice.OPEN) {
-			// return game is over
+					return true;
+				} else {
 
-			return true;
+					state = GameState.O_WON;
+					return true;
+				}
+			}
+
 		}
-		// diagonal
 		if ((board[2][0] == board[1][1]) && (board[1][1] == board[0][2]) && board[2][0] != BoardChoice.OPEN) {
 
-			// return game is over
+			if (board[2][0] == BoardChoice.X) {
+				state = GameState.X_WON;
 
-			return true;
+				return true;
+			} else {
+				state = GameState.O_WON;
+				return true;
+			}
+			// return game is over
 		}
 		if ((board[0][0] == board[1][1]) && (board[1][1] == board[2][2]) && board[0][0] != BoardChoice.OPEN) {
+
+			if (board[0][0] == BoardChoice.X) {
+				state = GameState.X_WON;
+
+				return true;
+			} else {
+				state = GameState.O_WON;
+				return true;
+			}
 			// return game is over
 
-			return true;
 		}
-		int count = 0;
-		for (int i = 0; i < 3; i++) {
-
-			for (int j = 0; j < 3; j++) {
-
+		
+		for (int i = 0; i < DIM; i++) {
+			for (int j = 0; j < DIM; j++) {
 				if (board[i][j] == BoardChoice.OPEN) {
-					count += 1;
+					state = GameState.IN_PROGRESS;
+					return false;
 				}
 
 			}
-			// check if theres any moves left if not ends the game
 		}
-
-		if (count <= 0) {
-
+		
+		state = GameState.TIE;
 			return true;
-		}
-
+		/**
+		state = GameState.IN_PROGRESS;
 		return false;
+		**/
 
 	}
 
 	@Override
 	public GameState getGameState() {
-		// GameState
-		if (numOfMoves == 9 && gameOver() == true) {
-			
-			return state.TIE;}
-		
-		if (numOfMoves % 2 == 0) {
-			return state.O_WON;
+		if (gameOver() == true) {
+			return state;
+		} else {
+			return state.IN_PROGRESS;
 		}
 
-			return state.X_WON;
 	}
-		
-	
-			
-			
 
 	@Override
 	public BoardChoice[][] getGameGrid() {
-		BoardChoice[][] copyB = board;
+		BoardChoice[][] copyB = new BoardChoice[DIM][DIM];
+		for (int i = 0; i < DIM; i++) {
+			for (int j = 0; j < DIM; j++) {
+				copyB[i][j] = board[i][j];
+			}
+		}
+
 		return copyB;
 
 	}
