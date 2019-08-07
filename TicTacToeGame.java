@@ -14,8 +14,6 @@ public class TicTacToeGame implements TicTacToe {
 	private GameState state;
 	private int numOfMoves = 0;
 	private Point[] moveHistory = new Point[DIM * DIM];
-
-	
 	// test
 	// numOfMoves =0;
 	// board already populated
