@@ -15,6 +15,7 @@ public class TicTacToeGame implements TicTacToe {
 	private int numOfMoves = 0;
 	private Point[] moveHistory = new Point[DIM * DIM];
 
+	
 	// test
 	// numOfMoves =0;
 	// board already populated
@@ -34,6 +35,13 @@ public class TicTacToeGame implements TicTacToe {
 	public boolean choose(BoardChoice player, int row, int col) {
 		// add move to a point object
 		// if gameOver() == true return false
+		if ((numOfMoves % 2 == 0) && (player == BoardChoice.O)) {
+			return false;
+		}
+		if ((numOfMoves % 2 > 0) && (player == BoardChoice.X)) {
+			return false;
+		}
+		
 		if (gameOver() == true) {
 			return false;
 		}
